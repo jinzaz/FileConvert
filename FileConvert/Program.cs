@@ -26,7 +26,6 @@ namespace FileConvert
                     webBuilder.UseKestrel();
                     webBuilder.CaptureStartupErrors(false);
                     webBuilder.ConfigureAppConfiguration((context,config) => {
-                        config.AddJsonFile("GDCAInfo.json",false,true);
                     }).UseStartup<Startup>();
                 });
     }

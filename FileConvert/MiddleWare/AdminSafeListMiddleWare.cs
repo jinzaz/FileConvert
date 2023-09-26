@@ -1,6 +1,6 @@
-﻿using FileConvert.Log;
-using FileConvert.Model;
+﻿using FileConvert.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -16,17 +16,17 @@ namespace FileConvert.MiddleWare
     {
         private readonly RequestDelegate _next;
         private readonly List<OriginWhiteModel> _adminWhiteList;
-        private readonly ILoggerHelper _logger;
+        private readonly ILogger<AdminSafeListMiddleWare> _logger;
 
         public AdminSafeListMiddleWare(
             RequestDelegate next,
             IOptions<List<OriginWhiteModel>> adminSafeList,
-            ILoggerHelper loggerHelper
+            ILogger<AdminSafeListMiddleWare> logger
             )
         {
             _adminWhiteList = adminSafeList.Value;
             _next = next;
-            _logger = loggerHelper;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -37,7 +37,7 @@ namespace FileConvert.MiddleWare
             if (badIp)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                _logger.Debug(typeof(AdminSafeListMiddleWare),"非法域名："+ origin);
+                _logger.LogInformation("非法域名："+ origin);
                 return;
             }
             await _next.Invoke(context);

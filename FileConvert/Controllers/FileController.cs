@@ -6,18 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FileConvert.Model;
-using FileConvert.ffmpeg;
-using FileConvert.Log;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
-using System.Net.Http;
-using System.Net;
-using System.Net.Http.Headers;
-using Exceptionless;
 using FileConvert.Common;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Diagnostics;
@@ -25,6 +19,7 @@ using System.Buffers;
 using System.Threading;
 using FileConvert.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace FileConvert.Controllers
 {
@@ -36,17 +31,17 @@ namespace FileConvert.Controllers
     {
         private readonly VideoCompressSettings _videioCompressSettings;
         private readonly ImageCompressSettings _imageCompressSettings;
-        private readonly ILoggerHelper _logger;
+        private readonly ILogger<FileController> _logger;
         private readonly IFileConvertService _fileConvertService;
 
         public FileController(IOptions<VideoCompressSettings> videioOptions, 
-            IOptions<ImageCompressSettings> imageOptions, 
-            ILoggerHelper loggerHelper,
+            IOptions<ImageCompressSettings> imageOptions,
+            ILogger<FileController> logger,
             IFileConvertService fileConvertService)
         {
             _videioCompressSettings = videioOptions.Value;
             _imageCompressSettings = imageOptions.Value;
-            _logger = loggerHelper;
+            _logger = logger;
             _fileConvertService = fileConvertService;
         }
 
@@ -81,15 +76,13 @@ namespace FileConvert.Controllers
                         return Ok(videoBase64);
                     }
                     var fileString = await _fileConvertService.VideoCompress(videoBytes);
-                    ExceptionlessClient.Default.SubmitLog(typeof(Program).FullName, $"接口：VideoCompress调用成功 Source：{HttpContext.Request.Headers["Origin"]}");
                     return Ok(Convert.ToBase64String(fileString));
                 }
                 throw new OperationCanceledException("客户端手动取消");
             }
             catch (Exception ex)
             {
-                _logger.Error(typeof(FileController), $"请求异常 Source{HttpContext.Request.Headers["Origin"]}", ex);
-                ex.ToExceptionless().Submit();
+                _logger.LogError(ex, $"请求异常 Source{HttpContext.Request.Headers["Origin"]}");
                 return Ok(videoBase64);
             }
             finally
@@ -124,8 +117,7 @@ namespace FileConvert.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Error(typeof(FileController), "请求异常", ex);
-                ex.ToExceptionless().Submit();
+                _logger.LogError(ex, "请求异常");
                 return Ok(videoBytes);
             }
         }
@@ -160,15 +152,13 @@ namespace FileConvert.Controllers
                         return Ok(new JsonResultModel { result = 0, msg = "图片小于1M" });
                     }
                     var fileString = await _fileConvertService.ImageCompress(imageBytes);
-                    ExceptionlessClient.Default.SubmitLog(typeof(Program).FullName, $"接口：ImageCompress调用成功 Source：{HttpContext.Request.Headers["Origin"]}");
                     return Ok(Convert.ToBase64String(fileString));
                 }
                 throw new OperationCanceledException("客户端手动取消");
             }
             catch (Exception ex)
             {
-                _logger.Error(typeof(FileController), "请求异常", ex);
-                ex.ToExceptionless().Submit();
+                _logger.LogError(ex, "请求异常");
                 return Ok(new JsonResultModel { result = -1, msg = "请求异常" });
             }
             finally
@@ -199,13 +189,11 @@ namespace FileConvert.Controllers
                     return Ok(new JsonResultModel { result = 0, msg = "图片小于1M" });
                 }
                 var fileString = await _fileConvertService.ImageCompress(videoBytes);
-                ExceptionlessClient.Default.SubmitLog(typeof(Program).FullName, $"接口：ImageCompressByForm调用成功 Source：{HttpContext.Request.Headers["Origin"]}");
                 return Ok(Convert.ToBase64String(fileString));
             }
             catch (Exception ex)
             {
-                _logger.Error(typeof(FileController), "请求异常", ex);
-                ex.ToExceptionless().Submit();
+                _logger.LogError(ex, "请求异常");
                 return Ok(new JsonResultModel { result = -1, msg = "请求异常" });
             }
         }

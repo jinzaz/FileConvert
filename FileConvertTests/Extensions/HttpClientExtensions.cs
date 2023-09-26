@@ -8,7 +8,7 @@ namespace FileConvertTests.Extensions
 {
     static class HttpClientExtensions
     {
-        private const string Origin = "isrcauat.iqdii.com";
+        private const string Origin = "localhost";
         public static HttpClient CreateIdempotentClient(this TestServer server)
         {
             var client = server.CreateClient();

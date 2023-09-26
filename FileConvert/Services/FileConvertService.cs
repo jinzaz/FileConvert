@@ -1,6 +1,6 @@
 ﻿using FileConvert.ffmpeg;
-using FileConvert.Log;
 using FileConvert.Model;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace FileConvert.Services
     {
         private readonly VideoCompressSettings _videioCompressSettings;
         private readonly ImageCompressSettings _imageCompressSettings;
-        private readonly ILoggerHelper _logger;
+        private readonly ILogger<FileConvertService> _logger;   
         private readonly string workPath = AppDomain.CurrentDomain.BaseDirectory;
 
         private static Queue<string> _deleteList;
@@ -22,7 +22,7 @@ namespace FileConvert.Services
 
 
 
-        public FileConvertService(IOptions<VideoCompressSettings> videioOptions, IOptions<ImageCompressSettings> imageOptions, ILoggerHelper loggerHelper)
+        public FileConvertService(IOptions<VideoCompressSettings> videioOptions, IOptions<ImageCompressSettings> imageOptions, ILogger<FileConvertService> logger)
         {
             if (DeleteList == null)
             {
@@ -30,7 +30,7 @@ namespace FileConvert.Services
             }
             _videioCompressSettings = videioOptions.Value;
             _imageCompressSettings = imageOptions.Value;
-            _logger = loggerHelper;
+            _logger = logger;
         }
 
         public async Task<byte[]> VideoCompress(byte[] bytes)

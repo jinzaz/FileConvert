@@ -1,8 +1,5 @@
-﻿using FileConvert.Controllers;
-using FileConvert.Log;
-using FileConvert.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
+﻿using FileConvert.Services;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -16,12 +13,12 @@ namespace FileConvert.Common
 {
     public class TimedExecuteService :MyBackgroundService
     {
-		private readonly ILoggerHelper _logger;
+		private readonly ILogger<TimedExecuteService> _logger;
 		private readonly IFileConvertService _fileConvertService;
 
-		public TimedExecuteService(ILoggerHelper loggerHelper, IFileConvertService fileConvertService)
+		public TimedExecuteService(ILogger<TimedExecuteService> logger, IFileConvertService fileConvertService)
 		{
-			_logger = loggerHelper;
+			_logger = logger;
 			_fileConvertService = fileConvertService;
 		}
 
@@ -29,7 +26,7 @@ namespace FileConvert.Common
         {
 			try
 			{
-				_logger.Debug(typeof(TimedExecuteService),DateTime.Now.ToString() + "BackgroundService启动");
+				_logger.LogInformation(DateTime.Now.ToString() + "BackgroundService启动");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					await Task.Delay(5000, stoppingToken);
@@ -41,7 +38,7 @@ namespace FileConvert.Common
 						}
 						catch (Exception ex)
 						{
-							_logger.Error(typeof(TimedExecuteService), DateTime.Now.ToString() + "DeleteAllFile：异常", ex);
+							_logger.LogError(ex, DateTime.Now.ToString() + "DeleteAllFile：异常");
 						}
 					}
 				}
@@ -50,12 +47,12 @@ namespace FileConvert.Common
 			{
 				if (!stoppingToken.IsCancellationRequested)
 				{
-					_logger.Error(typeof(TimedExecuteService),DateTime.Now.ToString() + "BackgroundService：异常" ,ex);
+					_logger.LogError(ex, DateTime.Now.ToString() + "BackgroundService：异常");
 				}
 				else
 				{
 					
-					_logger.Error(typeof(TimedExecuteService),DateTime.Now.ToString() + "BackgroundService：停止", ex);
+					_logger.LogError(ex, DateTime.Now.ToString() + "BackgroundService：停止");
 				}
 				throw ex;
 			}

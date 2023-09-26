@@ -1,9 +1,8 @@
-﻿using Exceptionless;
-using FileConvert.Log;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +13,12 @@ namespace FileConvert.Filter
     public class GlobalExceptionFilter : IExceptionFilter   
     {
         private readonly IHostEnvironment _env;
-        private readonly ILoggerHelper _loggerHelper;
+        private readonly ILogger<GlobalExceptionFilter> _logger;
 
-        public GlobalExceptionFilter(IHostEnvironment env, ILoggerHelper loggerHelper)
+        public GlobalExceptionFilter(IHostEnvironment env, ILogger<GlobalExceptionFilter> logger)
         {
             _env = env;
-            _loggerHelper = loggerHelper;
+            _logger = logger;
         }
 
         public void OnException(ExceptionContext context)
@@ -32,8 +31,7 @@ namespace FileConvert.Filter
             }
             context.Result = new InternalServerErrorObjectResult(json);
 
-            _loggerHelper.Error(context.Exception.Source, json.Message, context.Exception);
-            context.Exception.ToExceptionless().Submit();
+            _logger.LogError(context.Exception.Source, json.Message, context.Exception);
         }
 
         public class InternalServerErrorObjectResult : ObjectResult

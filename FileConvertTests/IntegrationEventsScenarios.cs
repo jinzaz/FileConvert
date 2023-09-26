@@ -38,11 +38,6 @@ namespace FileConvertTests
                     Assert.NotNull(token);
                 }
 
-                //GetGDCAInfoAsync
-                var gdcaInfo = await GetGDCAInfoAsync(client);
-                Assert.IsType<List<GDCAInfoModel>>(gdcaInfo);
-                Assert.NotNull(gdcaInfo);
-
                 client.DefaultRequestHeaders.Add("Authorization", $"bearer {token.token}");
                 //PostVideoCompressByTextAsync
                 var videoCompressedText = await PostVideoCompressByTextAsync(client);
@@ -67,16 +62,6 @@ namespace FileConvertTests
             var response = await client.GetAsync(FileConvertScenariosBase.Get.GetToken);
             var result = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<TokenObject>(result, new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        }
-
-        private async Task<List<GDCAInfoModel>> GetGDCAInfoAsync(HttpClient client)
-        {
-            var response = await client.GetAsync(FileConvertScenariosBase.Get.GetGDCAInfo);
-            var result = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<GDCAInfoModel>>(result, new JsonSerializerOptions()
             {
                 PropertyNameCaseInsensitive = true
             });

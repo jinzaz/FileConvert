@@ -20,19 +20,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TempFiles\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="TempFiles\20201113_091411.mp4">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="TempFiles\test.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="TempFiles\wallhaven-rd7k1j_3840x2160.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="TempFiles\video1.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="COPY $(SolutionDir)\FileConvert\appsettings.json $(ProjectDir)&#xD;&#xA;COPY $(SolutionDir)\FileConvert\GDCAInfo.json $(ProjectDir)" />
+    <Exec Command="COPY $(SolutionDir)\FileConvert\appsettings.json $(ProjectDir)" />
   </Target>
 </Project>

@@ -40,7 +40,7 @@ namespace FileConvert.Controllers
         [Route("GetToken")]
         public  IActionResult GetToken(string OrgCode)
         {
-            var data = _originWhiteModellist.Where(x => x.OrgCodeList.IndexOf(OrgCode.ToUpper()) > -1 && _httpContextAccessor.HttpContext.Request.Headers["Origin"].FirstOrDefault().Contains(x.Origin)).FirstOrDefault();
+            var data = _originWhiteModellist.Where(x => x.OrgCodeList.IndexOf(OrgCode) > -1 && _httpContextAccessor.HttpContext.Request.Headers["Origin"].FirstOrDefault().Contains(x.Origin)).FirstOrDefault();
             if (data == null)
             { return Ok(new { token = "",expiration = "" }); }
             //创建claim

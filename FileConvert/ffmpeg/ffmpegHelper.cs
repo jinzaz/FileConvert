@@ -1,5 +1,4 @@
-﻿using FileConvert.Log;
-using FileConvert.Model;
+﻿using FileConvert.Model;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Options;
 using System;

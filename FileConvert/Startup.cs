@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using FileConvert.Common;
 using FileConvert.Filter;
 using FileConvert.Model;
-using FileConvert.Log;
 using FileConvert.MiddleWare;
 using log4net;
 using log4net.Config;
@@ -28,7 +27,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
-using Exceptionless;
 using FileConvert.Controllers;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -80,7 +78,7 @@ namespace FileConvert
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             app.UseMiddleware<GCMiddleWare>();
             app.UseConcurrencyLimiter();
@@ -119,7 +117,7 @@ namespace FileConvert
                 });
                 
             });
-            app.UseExceptionless();
+            loggerFactory.AddLog4Net();
 
         }
     }
@@ -242,12 +240,8 @@ namespace FileConvert
 
         public static IServiceCollection AddCustomLogService(this IServiceCollection services,IConfiguration configuration)
         {
-            services.AddSingleton<ILoggerHelper, LoggerHelper>();
             Startup.repository = LogManager.CreateRepository("FileConvert");
             XmlConfigurator.Configure(Startup.repository, new FileInfo("log4net.config"));
-
-            ExceptionlessClient.Default.Configuration.ApiKey = configuration.GetSection("Exceptionless:ApiKey").Value;
-            ExceptionlessClient.Default.Configuration.ServerUrl = configuration.GetSection("Exceptionless:ServerUrl").Value;
             return services;
         }
 

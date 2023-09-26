@@ -1,9 +1,8 @@
-﻿using Exceptionless;
-using FileConvert.Log;
-using FileConvert.Model;
+﻿using FileConvert.Model;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -18,16 +17,16 @@ namespace FileConvert.MiddleWare
     {
         private readonly RequestDelegate _next;
         private readonly List<OriginWhiteModel> _adminWhiteList;
-        private readonly ILoggerHelper _logger;
+        private readonly ILogger<AdminSafeListMiddleWare> _logger;
         private readonly IWebHostEnvironment _env;
         public CorsMiddleWare(RequestDelegate next,
                               IOptions<List<OriginWhiteModel>> adminSafeList,
-                              ILoggerHelper loggerHelper,
+                              ILogger<AdminSafeListMiddleWare> logger,
                               IWebHostEnvironment env)
         {
             _next = next;
             _adminWhiteList = adminSafeList.Value;
-            _logger = loggerHelper;
+            _logger = logger;
             _env = env;
         }
 
@@ -54,8 +53,7 @@ namespace FileConvert.MiddleWare
                     if (badIp)
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        _logger.Debug(typeof(CorsMiddleWare), "非法域名：" + origin);
-                        ExceptionlessClient.Default.SubmitLog(typeof(CorsMiddleWare).FullName, $"非法域名：{origin}");
+                        _logger.LogInformation("非法域名：" + origin);
                         return;
                     }
                 }
@@ -63,7 +61,7 @@ namespace FileConvert.MiddleWare
             }
             catch (Exception ex)
             {
-                _logger.Error(typeof(CorsMiddleWare),ex);
+                _logger.LogError(ex, "CorsMiddleWare Invoke Error");
             }
 
         }

@@ -24,7 +24,6 @@ namespace FileConvertTests
                 .ConfigureAppConfiguration((context,config) =>
                 {
                     config.AddJsonFile("appsettings.json", optional: false);
-                    config.AddJsonFile("GDCAInfo.json", false, true);
                 }).UseStartup<Startup>();
 
             var testServer = new TestServer(hostBuilder)
@@ -46,8 +45,7 @@ namespace FileConvertTests
 
         public static class Get
         {
-            public static string GetToken = "Authorize/GetToken?OrgCode=ISR";
-            public static string GetGDCAInfo = "GDCA/GetGDCAInfo";
+            public static string GetToken = "Authorize/GetToken?OrgCode=Test";
         }
 
         public static class Post
@@ -56,8 +54,8 @@ namespace FileConvertTests
             public static string PostVideoCompressByForm = "File/VideoCompressByForm";
             public static string PostImageCompressByText = "File/ImageCompress";
             public static string PostImageCompressByForm = "File/ImageCompressByForm";
-            public static string VideoFilePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\TempFiles\\20201113_091411.mp4";
-            public static string ImageFilePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\TempFiles\\wallhaven-rd7k1j_3840x2160.png";
+            public static string VideoFilePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\TempFiles\\video1.mp4";
+            public static string ImageFilePath = $"{AppDomain.CurrentDomain.BaseDirectory}\\TempFiles\\test.jpg";
         }
     }
 }
